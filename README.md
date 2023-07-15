@@ -16,7 +16,7 @@ Convert cai to json file
 cai2json filein.cai fileout.json
 ```
 
-Convert json to cai file. Currently in the works. 
+Convert json to cai file
 
 ```sh
 json2cai filein.json fileout.cai

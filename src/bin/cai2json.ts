@@ -24,10 +24,10 @@ function load(fileIn: string): CombinedActorInfo | undefined {
 var actor = load(fileIn);
 if (actor) {
     if (!fileOut) {
-        console.log(JSON.stringify(actor, null, 4))
+        console.log(actor.ToJson(true))
     } else {
         try {
-            fs.writeFileSync(fileOut, JSON.stringify(actor, null, 4));
+            fs.writeFileSync(fileOut, actor.ToJson(true));
         } catch (error) {
             console.log(error)
         }
