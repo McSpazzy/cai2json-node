@@ -2,10 +2,21 @@
 import { CombinedActorInfo } from 'combined-actor-info';
 import fs from 'fs';
 
+const saveMagic = 16909060;
 const [, , ...args] = process.argv;
 
 const fileIn = args[0];
-const fileOut = args.length > 1 ? args[1] : undefined;
+var fileOut = args.length > 1 ? args[1] : undefined;
+var index = args.length > 2 ? args[2] : 1;
+
+if (!isNaN(Number(fileOut))) {
+    index = Number(fileOut);
+    fileOut = undefined;
+}
+
+if (index === 0) {
+    index = 1;
+}
 
 function load(fileIn: string): CombinedActorInfo | undefined {
     if (!fs.existsSync(fileIn)) {
@@ -14,8 +25,14 @@ function load(fileIn: string): CombinedActorInfo | undefined {
     }
     try {
         var data = fs.readFileSync(fileIn);
-        var entry = CombinedActorInfo.FromArrayBuffer(data.buffer);
-        return entry;
+        if (data.readUInt32LE(0) === saveMagic) {
+            var entry = CombinedActorInfo.FromSaveFileArrayBuffer(data.buffer, Number(index));
+            return entry;
+        } else {
+            var entry = CombinedActorInfo.FromArrayBuffer(data.buffer);
+            return entry;
+        }
+
     } catch (error) {
         console.log(error)
     }
@@ -24,10 +41,10 @@ function load(fileIn: string): CombinedActorInfo | undefined {
 var actor = load(fileIn);
 if (actor) {
     if (!fileOut) {
-        console.log(actor.ToJson(true))
+        console.log(CombinedActorInfo.ToJson(actor, true))
     } else {
         try {
-            fs.writeFileSync(fileOut, actor.ToJson(true));
+            fs.writeFileSync(fileOut, CombinedActorInfo.ToJson(actor, true));
         } catch (error) {
             console.log(error)
         }
