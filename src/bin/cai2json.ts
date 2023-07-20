@@ -1,53 +1,35 @@
 #!/usr/bin/env node
 import { CombinedActorInfo } from 'combined-actor-info';
-import fs from 'fs';
+import { loadFile, saveFile } from '..';
+import { program } from 'commander'
 
-const saveMagic = 16909060;
-const [, , ...args] = process.argv;
+program
+    .description('Tool for converting Zelda TotK CombinedActorInfo format to json')
+    .option('-o, --out [fileOut]', 'Output filename')
+    .option('-i, --index [index]', 'AutoBuild index if using progress.sav')
+    .argument('<fileIn>', 'Input cai/save');
 
-const fileIn = args[0];
-var fileOut = args.length > 1 ? args[1] : undefined;
-var index = args.length > 2 ? args[2] : 1;
+var p = program.parse(process.argv)
 
-if (!isNaN(Number(fileOut))) {
-    index = Number(fileOut);
-    fileOut = undefined;
-}
+const programOpts: { out?: string; index: number } = program.opts()
+const programArgs: string[] = p.processedArgs;
 
-if (index === 0) {
-    index = 1;
-}
-
-function load(fileIn: string): CombinedActorInfo | undefined {
-    if (!fs.existsSync(fileIn)) {
-        console.log('File does not exist', fileIn);
-        return;
-    }
-    try {
-        var data = fs.readFileSync(fileIn);
-        var dataBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        if (data.readUInt32LE(0) === saveMagic) {
-            var entry = CombinedActorInfo.FromSaveFileArrayBuffer(dataBuffer, Number(index));
-            return entry;
-        } else {
-            var entry = CombinedActorInfo.FromArrayBuffer(dataBuffer);
-            return entry;
-        }
-
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-var actor = load(fileIn);
-if (actor) {
-    if (!fileOut) {
-        console.log(CombinedActorInfo.ToJson(actor, true))
+; (async (file: string, fileOut: string, index: number) => {
+    var dataBuffer = loadFile(file);
+    if (!dataBuffer) { return; }
+    var cai: CombinedActorInfo;
+    if (dataBuffer.readUInt32LE(0) === 16909060) {
+        if (index < 1) { index = 1; }
+        if (index > 30) { index = 1; }
+        cai = CombinedActorInfo.FromSaveFileArrayBuffer(dataBuffer.buffer, Number(index));
     } else {
-        try {
-            fs.writeFileSync(fileOut, CombinedActorInfo.ToJson(actor, true));
-        } catch (error) {
-            console.log(error)
-        }
+        cai = CombinedActorInfo.FromArrayBuffer(dataBuffer.buffer);
     }
-}
+
+    if (fileOut === '') {
+        console.log(CombinedActorInfo.ToJson(cai, true))
+    } else {
+        saveFile(fileOut, cai, 'json');
+    }
+
+})(programArgs[0], programOpts.out ?? '', programOpts.index);

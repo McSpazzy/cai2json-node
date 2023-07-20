@@ -10,22 +10,40 @@ npm install -g cai2json
 
 ## Usage
 
-Convert cai to json file
-
 ```sh
-cai2json filein.cai fileout.json
+Usage: cai2json [options] <fileIn>
+
+Tool for converting Zelda TotK CombinedActorInfo format to json
+
+Arguments:
+  fileIn               Input cai/save
+
+Options:
+  -o, --out [fileOut]  Output filename
+  -i, --index [index]  AutoBuild index if using progress.sav
+  -h, --help           display help for command
+
 ```
 
-also supports reading save files, by index 1-30
 ```sh
-cai2json progress.sav fileout-1.json 1
-cai2json progress.sav fileout-13.json 13
-cai2json progress.sav fileout-30.json 30
+Usage: json2cai [options] <fileIn>
+
+Tool for converting Zelda TotK CombinedActorInfo Json format to cai
+
+Arguments:
+  fileIn               Input json
+
+Options:
+  -o, --out <fileOut>  Output filename
+  -h, --help           display help for command
 ```
 
-Convert json to cai file
+## Examples
 
 ```sh
-json2cai filein.json fileout.cai
-```
+cai2json autobuild.cai
+cai2json autobuild.cai -o autobuild.json
+cai2json progress.sav -i 1 -o autobuild-1.json
 
+json2cai autobuild.json -o autobuild.cai
+```

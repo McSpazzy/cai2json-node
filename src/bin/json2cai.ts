@@ -1,37 +1,23 @@
 #!/usr/bin/env node
 import { CombinedActorInfo } from 'combined-actor-info';
-import fs from 'fs';
+import { loadFile, saveFile } from '..';
+import { program } from 'commander'
 
-const [, , ...args] = process.argv;
+program
+    .description('Tool for converting Zelda TotK CombinedActorInfo Json format to cai')
+    .requiredOption('-o, --out <fileOut>', 'Output filename')
+    .argument('<fileIn>', 'Input json');
 
-const fileIn = args[0];
-const fileOut = args.length > 1 ? args[1] : undefined;
 
-function load(fileIn: string): CombinedActorInfo | undefined {
-    if (!fs.existsSync(fileIn)) {
-        console.log('File does not exist', fileIn);
-        return;
-    }
-    try {
-        var data = fs.readFileSync(fileIn);
-        var dataBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        var entry = CombinedActorInfo.FromArrayBuffer(dataBuffer);
-        return entry;
-    } catch (error) {
-        console.log(error)
-    }
-}
+var p = program.parse(process.argv)
 
-var actor = load(fileIn);
-if (actor) {
-    if (!fileOut) {
-        console.log('Must Specify Output File')
-    } else {
-        try {
-            var data = CombinedActorInfo.ToArrayBuffer(actor);
-            fs.writeFileSync(fileOut, new DataView(data));
-        } catch (error) {
-            console.log(error)
-        }
-    }
-}
+const programOpts: { out: string; } = program.opts()
+const programArgs: string[] = p.processedArgs;
+
+; (async (file: string, fileOut: string) => {
+    var dataBuffer = loadFile(file);
+    if (!dataBuffer) { return; }
+    var cai = CombinedActorInfo.FromArrayBuffer(dataBuffer.buffer);
+    saveFile(fileOut, cai, 'json');
+
+})(programArgs[0], programOpts.out);
