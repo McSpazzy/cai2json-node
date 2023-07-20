@@ -1,6 +1,6 @@
 {
   "name": "cai2json",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Package for converting Zelda TotK CombinedActorInfo files to json and back",
   "main": "./lib/index.js",
   "scripts": {

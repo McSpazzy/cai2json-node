@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { CombinedActorInfo } from 'combined-actor-info';
-import { loadFile, saveFile } from '..';
+import { loadFile, saveFile } from './base';
 import { program } from 'commander'
 
 program
@@ -18,6 +18,6 @@ const programArgs: string[] = p.processedArgs;
     var dataBuffer = loadFile(file);
     if (!dataBuffer) { return; }
     var cai = CombinedActorInfo.FromArrayBuffer(dataBuffer.buffer);
-    saveFile(fileOut, cai, 'json');
+    saveFile(fileOut, cai, 'cai');
 
 })(programArgs[0], programOpts.out);

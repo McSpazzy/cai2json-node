@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { CombinedActorInfo } from 'combined-actor-info';
-import { loadFile, saveFile } from '..';
+import { loadFile, saveFile } from './base';
 import { program } from 'commander'
 
 program
