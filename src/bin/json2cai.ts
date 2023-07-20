@@ -14,7 +14,8 @@ function load(fileIn: string): CombinedActorInfo | undefined {
     }
     try {
         var data = fs.readFileSync(fileIn);
-        var entry = CombinedActorInfo.FromArrayBuffer(data.buffer);
+        var dataBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+        var entry = CombinedActorInfo.FromArrayBuffer(dataBuffer);
         return entry;
     } catch (error) {
         console.log(error)

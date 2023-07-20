@@ -25,11 +25,12 @@ function load(fileIn: string): CombinedActorInfo | undefined {
     }
     try {
         var data = fs.readFileSync(fileIn);
+        var dataBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         if (data.readUInt32LE(0) === saveMagic) {
-            var entry = CombinedActorInfo.FromSaveFileArrayBuffer(data.buffer, Number(index));
+            var entry = CombinedActorInfo.FromSaveFileArrayBuffer(dataBuffer, Number(index));
             return entry;
         } else {
-            var entry = CombinedActorInfo.FromArrayBuffer(data.buffer);
+            var entry = CombinedActorInfo.FromArrayBuffer(dataBuffer);
             return entry;
         }
 
